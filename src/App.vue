@@ -1,47 +1,78 @@
+<!-- src/App.vue -->
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const currentDate = ref('');
+
+
+const updateDate = () => {
+  const now = new Date();
+  const hours = now.getHours()
+  const minutes = now.getMinutes()
+  const day = now.getDate()
+  const month = now.getMonth() + 1
+  const year = now.getFullYear()
+  const time = `0${hours}`.slice(-2) + ':' + `0${minutes}`.slice(-2)
+  // splicing just as we did in stopwatch
+  currentDate.value = `${time} ${day}/${month}/${year}`
+  // updating value of ref element with the variables above
+  // to make it reactive
+}
+
+let intervalId: number
+
+onMounted(() => {
+  updateDate()  // Initial set
+  intervalId = setInterval(updateDate, 1000)  // Update every minute (or 1000 for seconds)
+})
+
+// onmounted lifecycle hook, waits until vue has created the elements in DOM,
+// then runs your callbacks inside of it eg sets interval to updateDate()
+
+onUnmounted(() => {
+  clearInterval(intervalId)
+})
+
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <div id="app">
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
 
-  <main>
-    <TheWelcome />
-  </main>
+      <div id="header">
+
+        <h1>Productivity Dashboard</h1>
+        <h2 id="time">{{ currentDate }}</h2>
+
+      </div>
+
+      <!-- Routed content (TabsWrapper) will render here -->
+      <router-view>
+
+      </router-view>
+
+
+
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+
+#app {
+  background: lightgray;
+  border-radius: 1rem;
+  padding: 1rem;
+
+
+  font-family: "Google Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings:
+      "GRAD" 0;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+#header {
+  justify-self: center;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
 </style>
